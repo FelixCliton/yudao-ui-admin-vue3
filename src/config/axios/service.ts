@@ -108,7 +108,7 @@ service.interceptors.response.use(
     if (ignoreMsgs.indexOf(msg) !== -1) {
       // 如果是忽略的错误码，直接返回 msg 异常
       return Promise.reject(msg)
-    } else if (code === 401) {
+    } else if (code === '401'|| code===401) {
       // 如果未认证，并且未进行刷新令牌，说明可能是访问令牌过期了
       if (!isRefreshToken) {
         isRefreshToken = true
@@ -148,24 +148,19 @@ service.interceptors.response.use(
           })
         })
       }
-    } else if (code === 500) {
+    } else if (code === '500' || code === 500) {
       ElMessage.error(t('sys.api.errMsg500'))
       return Promise.reject(new Error(msg))
-    } else if (code === 901) {
+    } else if (code === '901'|| code === 901) {
       ElMessage.error({
         offset: 300,
         dangerouslyUseHTMLString: true,
         message:
           '<div>' +
-          t('sys.api.errMsg901') +
-          '</div>' +
-          '<div> &nbsp; </div>' +
-          '<div>参考 https://doc.iocoder.cn/ 教程</div>' +
-          '<div> &nbsp; </div>' +
-          '<div>5 分钟搭建本地环境</div>'
+          t('sys.api.errMsg901')
       })
       return Promise.reject(new Error(msg))
-    } else if (code !== 200) {
+    } else if (code !== 200 && code !== '0' && code !=='200') {
       if (msg === '无效的刷新令牌') {
         // hard coding：忽略这个提示，直接登出
         console.log(msg)
@@ -201,10 +196,6 @@ const refreshToken = async () => {
 const handleAuthorized = () => {
   const { t } = useI18n()
   if (!isRelogin.show) {
-    // 如果已经到登录页面则不进行弹窗提示
-    if (window.location.href.includes('login')) {
-      return
-    }
     isRelogin.show = true
     ElMessageBox.confirm(t('sys.api.timeoutMessage'), t('common.confirmTitle'), {
       showCancelButton: false,
